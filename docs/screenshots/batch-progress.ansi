@@ -1,0 +1,12 @@
+[38;2;248;250;252mmakemkv-tui — Batch Processing[0m
+Discovered: 3 ISOs · Status: running · Saved: 12:00:00
+ISO: 1/3 · series/disc01.iso
+Title: 2/2 · ID 17
+Current process: 61.0% · Current title: 61.0% · Overall: 26.8%
+Title   █████████████████████░░░░░░░░░░░░░░  61%
+Overall █████████░░░░░░░░░░░░░░░░░░░░░░░░░░  27%
+Completed: 1 · Pending/running: 5 · Interrupted: 0 · Failed: 0
+Operation: Extracting title (synthetic progress) · Elapsed execution: 15m0s
+[Ctrl+C] stop immediately (again: force) · [S] stop after current ISO
+Synthetic engine event: copying title 17
+Verified completions: 1

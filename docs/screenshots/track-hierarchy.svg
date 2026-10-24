@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="912" height="664" viewBox="0 0 912 664"><title>track-hierarchy.ansi — actual renderer, synthetic data</title><rect width="100%" height="100%" rx="10" fill="#0b1020"/><g font-family="Consolas,DejaVu Sans Mono,monospace" font-size="13" xml:space="preserve"><text x="16" y="24" fill="#94a3b8">makemkv-tui · ACTUAL VIEW RENDER · SYNTHETIC DATA</text>
+<text x="16" y="51" fill="#f8fafc" font-weight="normal">makemkv-tui</text>
+<text x="104" y="51" fill="#e5e7eb" font-weight="normal"> · 1/3 selected · </text>
+<text x="248" y="51" fill="#f8fafc" font-weight="normal">disc01.iso</text>
+<text x="16" y="70" fill="#ff6b6b" font-weight="normal">VIDEO</text>
+<text x="56" y="70" fill="#e5e7eb" font-weight="normal"> · </text>
+<text x="80" y="70" fill="#49de80" font-weight="normal">AUDIO</text>
+<text x="120" y="70" fill="#e5e7eb" font-weight="normal"> · </text>
+<text x="144" y="70" fill="#60a5fa" font-weight="normal">SUB</text>
+<text x="168" y="70" fill="#e5e7eb" font-weight="normal">   [x] selected  &gt; focus</text>
+<text x="16" y="89" fill="#93a3b8" font-weight="normal">── Title explorer · rows 1–11/11 ──</text>
+<text x="16" y="108" fill="#f8fafc" font-weight="normal">  ▼ [x] Title 6 · 1:37:06 · 16.6 GB · Example episode — Magyar / 日本語</text>
+<text x="16" y="127" fill="#ff6b6b" font-weight="normal">    ├─ + VIDEO  H.264 / AVC · 1920x1080 · 23.976 (24000/1001) · 16:9</text>
+<rect x="16" y="131" width="576" height="19" fill="#1e283b"/><text x="16" y="146" fill="#49de80" font-weight="bold">&gt;   ├─ + AUDIO  Magyar (hun) · AC3 · stereo · 448 Kb/s · 48000 · Default</text>
+<rect x="592" y="131" width="304" height="19" fill="#1e283b"/><text x="592" y="146" fill="#e5e7eb" font-weight="normal">                                      </text>
+<text x="16" y="165" fill="#49de80" font-weight="normal">    ├─ + AUDIO  English (eng) · DTS-HD MA · 5.1(side) · 48000</text>
+<text x="16" y="184" fill="#60a5fa" font-weight="normal">    ├─ + SUB  Magyar (hun) · PGS · Forced · Forced, &#34;signs&#34; and songs</text>
+<text x="16" y="203" fill="#60a5fa" font-weight="normal">    ├─ + SUB  English (eng) · SRT</text>
+<text x="16" y="222" fill="#ff6b6b" font-weight="normal">    ├─ + VIDEO  HEVC Main 10 · 3840x2160</text>
+<text x="16" y="241" fill="#f8fafc" font-weight="normal">    ├─ + OTHER  Unrecognized codec</text>
+<text x="16" y="260" fill="#93a3b8" font-weight="normal">    └─ Chapters: 24</text>
+<text x="16" y="279" fill="#f8fafc" font-weight="normal">  ▶ [ ] Title 42 · 0:44:13 · N/A · Bonus, feature</text>
+<text x="16" y="298" fill="#f8fafc" font-weight="normal">  ▶ [ ] Title 99 · N/A · N/A · Unknown metadata</text>
+<text x="16" y="412" fill="#93a3b8" font-weight="normal">── Metadata · [ / ] scroll ──</text>
+<text x="16" y="431" fill="#49de80" font-weight="normal">AUDIO — Magyar (hun) · Stream 1</text>
+<text x="16" y="450" fill="#93a3b8" font-weight="normal">Type: </text>
+<text x="64" y="450" fill="#e5e7eb" font-weight="normal">Audio</text>
+<text x="16" y="469" fill="#93a3b8" font-weight="normal">Language: </text>
+<text x="96" y="469" fill="#e5e7eb" font-weight="normal">Magyar (hun)</text>
+<text x="16" y="488" fill="#93a3b8" font-weight="normal">Codec: </text>
+<text x="72" y="488" fill="#e5e7eb" font-weight="normal">AC3</text>
+<text x="16" y="507" fill="#93a3b8" font-weight="normal">Channel layout: </text>
+<text x="144" y="507" fill="#e5e7eb" font-weight="normal">stereo</text>
+<text x="16" y="526" fill="#93a3b8" font-weight="normal">Channels: </text>
+<text x="96" y="526" fill="#e5e7eb" font-weight="normal">2</text>
+<text x="16" y="545" fill="#93a3b8" font-weight="normal">Bitrate: </text>
+<text x="88" y="545" fill="#e5e7eb" font-weight="normal">448 Kb/s</text>
+<text x="16" y="564" fill="#93a3b8" font-weight="normal">Sample rate: </text>
+<text x="120" y="564" fill="#e5e7eb" font-weight="normal">48000</text>
+<text x="16" y="583" fill="#93a3b8" font-weight="normal">Sample size: </text>
+<text x="120" y="583" fill="#e5e7eb" font-weight="normal">16</text>
+<text x="16" y="602" fill="#e5e7eb" font-weight="normal">↑/↓ move · ←/→/Tab fold · Space select · A/D all/none</text>
+<text x="16" y="621" fill="#e5e7eb" font-weight="normal">Enter: output · n: filename · Ctrl+P preferences · Ctrl+L logs</text>
+<text x="16" y="640" fill="#93a3b8" font-weight="normal">Tracks read-only · supported profiles or post-extraction MKVToolNix</text>
+</g></svg>

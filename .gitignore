@@ -1,0 +1,50 @@
+# Build products
+/bin/
+/build/
+/dist/
+/makemkv-tui
+/makemkv-tui.exe
+/makemkv-tui-freebsd-*
+/makemkv-tui-linux-*
+/makemkv-tui-windows-*
+/makemkv-tui-darwin-*
+*.test
+*.test.exe
+*.out
+*.core
+*.tar.gz
+*.zip
+
+# Runtime state, logs and extraction attempts (keep test fixtures tracked)
+batch-state*.json
+.batch-state*.json
+*.lock
+*.log
+.makemkv-batch/
+.makemkv-tui-*/
+.makemkv-remux-*/
+preferences.json
+/batches/
+/config.local.json
+*.tmp
+
+# Local caches and editor state
+.cache/
+.gocache/
+.gopath/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# User configuration, credentials and media
+.env
+.env.*
+!.env.example
+.MakeMKV/
+settings.conf
+*.key
+*.pem
+*.iso
+*.ISO
+*.mkv

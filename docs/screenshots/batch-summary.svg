@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="912" height="322" viewBox="0 0 912 322"><title>batch-summary.ansi — actual renderer, synthetic data</title><rect width="100%" height="100%" rx="10" fill="#0b1020"/><g font-family="Consolas,DejaVu Sans Mono,monospace" font-size="13" xml:space="preserve"><text x="16" y="24" fill="#94a3b8">makemkv-tui · ACTUAL VIEW RENDER · SYNTHETIC DATA</text>
+<text x="16" y="51" fill="#f8fafc" font-weight="normal">makemkv-tui — Batch Processing</text>
+<text x="16" y="70" fill="#e5e7eb" font-weight="normal">Discovered: 3 ISOs · Status: ready · Saved: 12:00:00</text>
+<text x="16" y="89" fill="#e5e7eb" font-weight="normal">Selected titles: 6 · Estimated size: 92.76 GiB · Unknown estimates: 0</text>
+<text x="16" y="108" fill="#e5e7eb" font-weight="normal">Selected ISOs: 3 · Skipped files: 0</text>
+<text x="16" y="127" fill="#e5e7eb" font-weight="normal">&gt; ISO 1 · series/disc01.iso · selected · titles [6 17]</text>
+<text x="16" y="146" fill="#e5e7eb" font-weight="normal">    ID 6 · pending · 15.46 GiB → \media\output\series\disc01\title6.mkv</text>
+<text x="16" y="165" fill="#e5e7eb" font-weight="normal">    ID 17 · pending · 15.46 GiB → \media\output\series\disc01\title17.mkv</text>
+<text x="16" y="184" fill="#e5e7eb" font-weight="normal">  ISO 2 · series/disc02.iso · selected · titles [6 17]</text>
+<text x="16" y="203" fill="#e5e7eb" font-weight="normal">    ID 6 · pending · 15.46 GiB → \media\output\series\disc02\title6.mkv</text>
+<text x="16" y="222" fill="#e5e7eb" font-weight="normal">    ID 17 · pending · 15.46 GiB → \media\output\series\disc02\title17.mkv</text>
+<text x="16" y="241" fill="#e5e7eb" font-weight="normal">  ISO 3 · feature.iso · selected · titles [6 17]</text>
+<text x="16" y="260" fill="#e5e7eb" font-weight="normal">    ID 6 · pending · 15.46 GiB → \media\output\feature\title6.mkv</text>
+<text x="16" y="279" fill="#e5e7eb" font-weight="normal">    ID 17 · pending · 15.46 GiB → \media\output\feature\title17.mkv</text>
+<text x="16" y="298" fill="#e5e7eb" font-weight="normal">↑/↓: ISO · E: edit selections · R: retry failed titles · Enter: final confirmation · q: save &amp; exit</text>
+</g></svg>
