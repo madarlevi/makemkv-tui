@@ -73,12 +73,16 @@ func TestExplorerColorsAndMonochrome(t *testing.T) {
 	if videoColor.TrueColor != "#FF6B6B" || audioColor.TrueColor != "#4ADE80" || subColor.TrueColor != "#60A5FA" {
 		t.Fatal("palette changed")
 	}
-	// termenv 0.16 truncates a floating-point channel at 73.999... for #4A;
-	// verify the configured exact hex above and this renderer's actual output.
-	for _, rgb := range []string{"38;2;255;107;107", "38;2;73;222;128", "38;2;96;165;250"} {
+	// termenv/colorful use floating-point conversion: green's red channel may
+	// truncate to 73 or round to 74 across compilers/architectures. The exact
+	// product palette is asserted above; both renderer representations are valid.
+	for _, rgb := range []string{"38;2;255;107;107", "38;2;96;165;250"} {
 		if !strings.Contains(view, rgb) {
 			t.Fatalf("missing %s in %q", rgb, view)
 		}
+	}
+	if !strings.Contains(view, "38;2;73;222;128") && !strings.Contains(view, "38;2;74;222;128") {
+		t.Fatal("missing green AUDIO foreground", view)
 	}
 	for _, label := range []string{"VIDEO", "AUDIO", "SUB", "Magyar", "DTS-HD MA", "PGS", "N/A"} {
 		if !strings.Contains(view, label) {

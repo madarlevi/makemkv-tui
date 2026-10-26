@@ -1,0 +1,12 @@
+[
+{ type: install
+  message: <<EOM
+makemkv-tui uses the separately installed makemkvcon engine on PATH.
+The multimedia/makemkv dependency has separate license and usage requirements
+and may require FreeBSD Linux compatibility. This package bundles no engine.
+Verify makemkvcon --help before extraction. Source track selection is read-only.
+Batch plans default to $XDG_STATE_HOME/makemkv-tui/batches/ or
+$HOME/.local/state/makemkv-tui/batches/. Preserve plans and staged MKVs on errors.
+EOM
+}
+]

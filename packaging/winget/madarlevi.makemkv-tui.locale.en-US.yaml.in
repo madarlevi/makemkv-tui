@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
+PackageIdentifier: madarlevi.makemkv-tui
+PackageVersion: @VERSION@
+PackageLocale: en-US
+Publisher: madarlevi
+PublisherUrl: https://github.com/madarlevi
+PublisherSupportUrl: https://github.com/madarlevi/makemkv-tui/issues
+PackageName: makemkv-tui
+PackageUrl: https://github.com/madarlevi/makemkv-tui
+License: MIT
+LicenseUrl: https://github.com/madarlevi/makemkv-tui/blob/v@VERSION@/LICENSE
+Copyright: Copyright (c) 2026 madarlevi
+ShortDescription: Keyboard-driven terminal frontend for MakeMKV
+Description: Browse titles and stream metadata and plan resumable ISO extraction batches. Requires a separately installed makemkvcon engine on PATH, with its separate license and usage requirements. No MakeMKV engine or registration keys are included.
+Moniker: makemkv-tui
+Tags:
+  - terminal
+  - tui
+  - makemkv
+  - bluray
+  - dvd
+ReleaseNotesUrl: https://github.com/madarlevi/makemkv-tui/releases/tag/v@VERSION@
+ManifestType: defaultLocale
+ManifestVersion: 1.12.0

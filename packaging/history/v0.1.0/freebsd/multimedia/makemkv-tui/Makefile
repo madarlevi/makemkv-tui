@@ -1,0 +1,39 @@
+PORTNAME=	makemkv-tui
+DISTVERSIONPREFIX=	v
+DISTVERSION=	0.1.0
+CATEGORIES=	multimedia
+
+MAINTAINER=	madar.levi102@gmail.com
+COMMENT=	Keyboard-driven MakeMKV frontend with resumable ISO batches
+WWW=		https://github.com/madarlevi/makemkv-tui
+
+LICENSE=	MIT
+LICENSE_FILE=	${WRKSRC}/LICENSE
+
+RUN_DEPENDS=	makemkvcon:multimedia/makemkv
+
+USES=		go:modules
+GO_MODULE=	github.com/madarlevi/makemkv-tui
+GO_TARGET=	./cmd/makemkv-tui
+GO_LDFLAGS=	-w -buildid= -X main.version=v${DISTVERSION}
+CGO_ENABLED=	0
+
+PLIST_FILES=	bin/makemkv-tui
+PORTDOCS=	BATCH.md ENGINE_RESEARCH.md README.md THIRD_PARTY.md \
+		THIRD_PARTY_LICENSES.txt
+
+OPTIONS_DEFINE=	DOCS
+
+# Notices remain installed even when optional user documentation is disabled.
+post-install:
+	${MKDIR} ${STAGEDIR}${DATADIR}
+	${INSTALL_DATA} ${WRKSRC}/THIRD_PARTY.md \
+		${WRKSRC}/THIRD_PARTY_LICENSES.txt ${STAGEDIR}${DATADIR}
+
+post-install-DOCS-on:
+	${MKDIR} ${STAGEDIR}${DOCSDIR}
+	${INSTALL_DATA} ${WRKSRC}/README.md ${WRKSRC}/THIRD_PARTY.md \
+		${WRKSRC}/THIRD_PARTY_LICENSES.txt ${WRKSRC}/docs/BATCH.md \
+		${WRKSRC}/docs/ENGINE_RESEARCH.md ${STAGEDIR}${DOCSDIR}
+
+.include <bsd.port.mk>

@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "repository": "madarlevi/makemkv-tui",
+  "tag": "v0.1.0",
+  "version": "0.1.0",
+  "prerelease": true,
+  "commit": "5a0c6950910ced230557ed88810c07629bed9e41",
+  "source_date_epoch": 1792844226,
+  "release_url": "https://github.com/madarlevi/makemkv-tui/releases/tag/v0.1.0",
+  "source": {
+    "filename": "makemkv-tui-v0.1.0-source.tar.gz",
+    "url": "https://api.github.com/repos/madarlevi/makemkv-tui/tarball/v0.1.0",
+    "sha256": "4507f22fdb338f642f8e297129de5cbfe38883a62dc05dbbb71af01ca1920a7f",
+    "size": 115654
+  },
+  "source_root": "madarlevi-makemkv-tui-5a0c695",
+  "modules": {
+    "mod": {
+      "filename": "source.mod",
+      "url": "https://proxy.golang.org/github.com/madarlevi/makemkv-tui/@v/v0.1.0.mod",
+      "sha256": "d3ee977fe5719b82b4088e2d614817a96a201e0407f52d8bb66d136ce2d486a3",
+      "size": 1252
+    },
+    "zip": {
+      "filename": "source.zip",
+      "url": "https://proxy.golang.org/github.com/madarlevi/makemkv-tui/@v/v0.1.0.zip",
+      "sha256": "9a7667f1ff227cf2acdc4a7e384daa7efa8dc0bf573cc3316b6562653d0c4161",
+      "size": 174533
+    }
+  },
+  "assets": {
+    "freebsd": {
+      "filename": "makemkv-tui-v0.1.2-freebsd-amd64.zip",
+      "url": "https://github.com/madarlevi/makemkv-tui/releases/download/v0.1.0/makemkv-tui-v0.1.2-freebsd-amd64.zip",
+      "sha256": "6af444011cdaa3dac1b5545272288753f66d2c22532c45ad169b7e9e047ad021",
+      "size": 1834191
+    },
+    "linux": {
+      "filename": "makemkv-tui-v0.1.2-linux-amd64.zip",
+      "url": "https://github.com/madarlevi/makemkv-tui/releases/download/v0.1.0/makemkv-tui-v0.1.2-linux-amd64.zip",
+      "sha256": "d6f433ab11e2494f1b1dfbadaed34b95552a1fd382a4a19f496b9eef4f432691",
+      "size": 1870495
+    },
+    "windows": {
+      "filename": "makemkv-tui-v0.1.2-windows-amd64.zip",
+      "url": "https://github.com/madarlevi/makemkv-tui/releases/download/v0.1.0/makemkv-tui-v0.1.2-windows-amd64.zip",
+      "sha256": "e74589d7a03d4749441b909e1628da8d53b23b0447dd25010b401afd85655230",
+      "size": 1960424
+    }
+  },
+  "notices": {
+    "THIRD_PARTY.md": {
+      "filename": "THIRD_PARTY.md",
+      "url": "https://raw.githubusercontent.com/madarlevi/makemkv-tui/5a0c6950910ced230557ed88810c07629bed9e41/THIRD_PARTY.md",
+      "sha256": "5f11b70a6d84965664cb3df3bf0b549c1c189f312598446c633de6f1953ef458",
+      "size": 2894
+    },
+    "THIRD_PARTY_LICENSES.txt": {
+      "filename": "THIRD_PARTY_LICENSES.txt",
+      "url": "https://raw.githubusercontent.com/madarlevi/makemkv-tui/5a0c6950910ced230557ed88810c07629bed9e41/THIRD_PARTY_LICENSES.txt",
+      "sha256": "30c833c93e87018a6d81a17b84970d48919f824c85e7f0aac09f684b52d58ab3",
+      "size": 32021
+    }
+  },
+  "observed_issues": [
+    "Only tagged release v0.1.0 is a prerelease; asset filenames instead say v0.1.2.",
+    "All uploaded executables were distributed without THIRD_PARTY.md and THIRD_PARTY_LICENSES.txt.",
+    "Windows release binary and go-install build both report dev; binary/source version correspondence is not established.",
+    "No macOS release asset exists. Homebrew builds the verified tagged source."
+  ]
+}

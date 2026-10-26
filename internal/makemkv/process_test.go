@@ -21,6 +21,7 @@ func TestHelperProcess(t *testing.T) {
 	os.Exit(0)
 }
 func TestProcessCapturesBothPipes(t *testing.T) {
+	t.Setenv("MAKEMKV_TEST_SLEEP", "0")
 	exe, e := os.Executable()
 	if e != nil {
 		t.Fatal(e)
@@ -37,11 +38,16 @@ func TestProcessCancellation(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	start := time.Now()
-	e = (Process{exe}).Run(ctx, []string{"-test.run=TestHelperProcess", "--", "helper"}, func(string) { cancel() })
-	if !errors.Is(e, context.Canceled) || time.Since(start) > 5*time.Second {
+	var requested time.Time
+	e = (Process{exe}).Run(ctx, []string{"-test.run=TestHelperProcess", "--", "helper"}, func(string) {
+		if requested.IsZero() {
+			requested = time.Now()
+			cancel()
+		}
+	})
+	if !errors.Is(e, context.Canceled) || requested.IsZero() || time.Since(requested) > 5*time.Second {
 		t.Fatal(e)
 	}
 }

@@ -1,0 +1,48 @@
+# Maintainer: Madár Levente <madar.levi102@gmail.com>
+pkgname=makemkv-tui
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Keyboard-driven MakeMKV frontend with resumable ISO batches'
+arch=('x86_64' 'aarch64')
+url='https://github.com/madarlevi/makemkv-tui'
+license=('MIT')
+makedepends=('go>=1.25')
+optdepends=('makemkv: external engine required for media processing; separately licensed')
+source=("${pkgname}-${pkgver}.tar.gz::https://api.github.com/repos/madarlevi/makemkv-tui/tarball/v${pkgver}")
+sha256sums=('4507f22fdb338f642f8e297129de5cbfe38883a62dc05dbbb71af01ca1920a7f')
+options=('!lto')
+_srcdir='madarlevi-makemkv-tui-5a0c695'
+
+prepare() {
+  cd "${srcdir}/${_srcdir}"
+  export GOPATH="${srcdir}/.gopath"
+  export GOTOOLCHAIN=local
+  go mod download
+}
+
+build() {
+  cd "${srcdir}/${_srcdir}"
+  export GOPATH="${srcdir}/.gopath"
+  export GOTOOLCHAIN=local CGO_ENABLED=0 GOPROXY=off
+  go build -mod=readonly -trimpath -buildvcs=false \
+    -ldflags "-s -w -buildid= -X main.version=v${pkgver}" \
+    -o makemkv-tui ./cmd/makemkv-tui
+}
+
+check() {
+  cd "${srcdir}/${_srcdir}"
+  export GOPATH="${srcdir}/.gopath"
+  export GOTOOLCHAIN=local CGO_ENABLED=0 GOPROXY=off
+  go test -mod=readonly ./...
+}
+
+package() {
+  cd "${srcdir}/${_srcdir}"
+  install -Dm755 makemkv-tui "${pkgdir}/usr/bin/makemkv-tui"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 THIRD_PARTY_LICENSES.txt "${pkgdir}/usr/share/licenses/${pkgname}/THIRD_PARTY_LICENSES.txt"
+  install -Dm644 THIRD_PARTY.md "${pkgdir}/usr/share/doc/${pkgname}/THIRD_PARTY.md"
+  install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+  install -Dm644 docs/BATCH.md "${pkgdir}/usr/share/doc/${pkgname}/BATCH.md"
+  install -Dm644 docs/ENGINE_RESEARCH.md "${pkgdir}/usr/share/doc/${pkgname}/ENGINE_RESEARCH.md"
+}

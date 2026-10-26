@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
+PackageIdentifier: madarlevi.makemkv-tui
+PackageVersion: 0.1.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: makemkv-tui-v0.1.2-windows-amd64.exe
+    PortableCommandAlias: makemkv-tui
+UpgradeBehavior: uninstallPrevious
+Commands:
+  - makemkv-tui
+ReleaseDate: 2026-10-24
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/madarlevi/makemkv-tui/releases/download/v0.1.0/makemkv-tui-v0.1.2-windows-amd64.zip
+    InstallerSha256: E74589D7A03D4749441B909E1628DA8D53B23B0447DD25010B401AFD85655230
+ManifestType: installer
+ManifestVersion: 1.12.0

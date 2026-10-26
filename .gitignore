@@ -14,6 +14,13 @@
 *.core
 *.tar.gz
 *.zip
+*.deb
+*.pkg.tar.zst
+__pycache__/
+*.pyc
+/packaging/aur/src/
+/packaging/aur/pkg/
+/packaging/aur/.gopath/
 
 # Runtime state, logs and extraction attempts (keep test fixtures tracked)
 batch-state*.json

@@ -6,7 +6,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"compress/gzip"
-	"crypto/sha256"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -25,16 +26,39 @@ var targets = map[string]bool{"freebsd/amd64": true, "linux/amd64": true, "windo
 var documents = []string{"LICENSE", "README.md", "THIRD_PARTY.md", "THIRD_PARTY_LICENSES.txt"}
 
 func main() {
-	version := flag.String("version", "", "version tag, e.g. v0.1.0")
-	target := flag.String("target", "", "OS/architecture")
-	out := flag.String("out", "dist", "archive directory")
-	checksums := flag.Bool("checksums", false, "write SHA256SUMS for archives in --out")
+	version := flag.String("version", "", "semantic version tag")
+	target := flag.String("target", "", "OS/architecture, or all")
+	out := flag.String("out", "dist/release", "isolated release output directory")
+	commit := flag.String("commit", "", "exact source commit SHA")
+	toolchain := flag.String("go-version", "", "required Go version (default .go-version)")
+	preview := flag.Bool("preview", false, "local simulation; artifacts cannot be published")
+	checksums := flag.Bool("checksums", false, "validate all five archives and create SHA256SUMS.txt")
+	verify := flag.Bool("verify", false, "validate all five archives and existing checksums")
 	flag.Parse()
+	if *toolchain == "" {
+		b, e := os.ReadFile(".go-version")
+		if e != nil {
+			fmt.Fprintln(os.Stderr, e)
+			os.Exit(1)
+		}
+		*toolchain = strings.TrimSpace(string(b))
+	}
 	var err error
-	if *checksums {
-		err = sums(*out)
-	} else {
-		err = build(*version, *target, *out)
+	switch {
+	case *checksums && *verify:
+		err = fmt.Errorf("choose checksums or verify")
+	case *checksums:
+		err = writeSums(*out, *version, *commit, *toolchain, *preview)
+	case *verify:
+		_, err = validateSet(*out, *version, *commit, *toolchain, *preview, true)
+	case *target == "all":
+		for _, t := range targetList() {
+			if err = build(*version, t, *out, *commit, *toolchain, *preview); err != nil {
+				break
+			}
+		}
+	default:
+		err = build(*version, *target, *out, *commit, *toolchain, *preview)
 	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -54,9 +78,15 @@ func epoch() (time.Time, error) {
 	return time.Unix(n, 0).UTC(), nil
 }
 
-func build(version, target, out string) error {
+func build(version, target, out, commit, toolchain string, preview bool) error {
 	if !versionRE.MatchString(version) || !targets[target] {
 		return fmt.Errorf("require a valid version tag and supported --target OS/architecture")
+	}
+	if e := validateIdentity(version, commit, preview); e != nil {
+		return e
+	}
+	if runtime.Version() != "go"+strings.TrimPrefix(toolchain, "go") {
+		return fmt.Errorf("use pinned Go %s, have %s", toolchain, runtime.Version())
 	}
 	stamp, e := epoch()
 	if e != nil {
@@ -64,6 +94,25 @@ func build(version, target, out string) error {
 	}
 	if e = os.MkdirAll(out, 0755); e != nil {
 		return e
+	}
+	entries, e := os.ReadDir(out)
+	if e != nil {
+		return e
+	}
+	for _, entry := range entries {
+		known := false
+		for _, t := range targetList() {
+			if entry.Name() == archiveName(version, t) && entry.Type().IsRegular() {
+				if _, _, e = inspectArchive(filepath.Join(out, entry.Name()), t, version, commit, toolchain, preview); e != nil {
+					return e
+				}
+				known = true
+				break
+			}
+		}
+		if !known {
+			return fmt.Errorf("choose a clean output directory; unexpected %s", entry.Name())
+		}
 	}
 	scratch, e := os.MkdirTemp(out, ".release-")
 	if e != nil {
@@ -81,7 +130,8 @@ func build(version, target, out string) error {
 	if e != nil {
 		return e
 	}
-	cmd := exec.Command("go", "build", "-mod=readonly", "-trimpath", "-buildvcs=false", "-ldflags", "-s -w -buildid= -X main.version="+version, "-o", binaryPath, "./cmd/makemkv-tui")
+	identity := "MKVTUI_BUILD_V1|" + version + "|" + commit + "|END_MKVTUI_BUILD_V1"
+	cmd := exec.Command("go", "build", "-mod=readonly", "-trimpath", "-buildvcs=false", "-ldflags", "-s -w -buildid= -X main.releaseIdentity="+identity, "-o", binaryPath, "./cmd/makemkv-tui")
 	// Remove inherited target settings before appending explicit build values.
 	for _, v := range os.Environ() {
 		k, _, _ := strings.Cut(v, "=")
@@ -95,6 +145,17 @@ func build(version, target, out string) error {
 	if e = cmd.Run(); e != nil {
 		return fmt.Errorf("build %s: %w", target, e)
 	}
+	if parts[0] == runtime.GOOS && parts[1] == runtime.GOARCH {
+		output, e := exec.Command(binaryPath, "--version").Output()
+		if e != nil || strings.TrimSpace(string(output)) != "makemkv-tui "+version {
+			return fmt.Errorf("native release version smoke failed: %q: %v", output, e)
+		}
+		output, e = exec.Command(binaryPath, "version", "--json").Output()
+		var info map[string]string
+		if e != nil || json.Unmarshal(output, &info) != nil || info["version"] != version || info["commit"] != commit || info["go_version"] != runtime.Version() {
+			return fmt.Errorf("native JSON identity smoke failed: %q: %v", output, e)
+		}
+	}
 	files := map[string][]byte{}
 	files[binary], e = os.ReadFile(binaryPath)
 	if e != nil {
@@ -106,6 +167,15 @@ func build(version, target, out string) error {
 			return e
 		}
 	}
+	if e = validateBinary(files[binary], target, version, commit, toolchain); e != nil {
+		return e
+	}
+	meta := metadata{1, version, commit, target, runtime.Version(), stamp.Unix(), hashBytes(files[binary]), preview}
+	files[metadataName], e = json.MarshalIndent(meta, "", "  ")
+	if e != nil {
+		return e
+	}
+	files[metadataName] = append(files[metadataName], '\n')
 	var content bytes.Buffer
 	if parts[0] == "windows" {
 		e = zipArchive(&content, files, binary, stamp)
@@ -119,6 +189,9 @@ func build(version, target, out string) error {
 	dest := filepath.Join(out, name)
 	// Release packaging also refuses accidental overwrites of existing artifacts.
 	if e = exclusiveWrite(dest, content.Bytes()); e != nil {
+		return e
+	}
+	if _, _, e = inspectArchive(dest, target, version, commit, toolchain, preview); e != nil {
 		return e
 	}
 	fmt.Println(dest)
@@ -200,36 +273,18 @@ func exclusiveWrite(path string, b []byte) (err error) {
 	}
 	return err
 }
-func sums(dir string) error {
-	entries, e := os.ReadDir(dir)
+func writeSums(dir, version, commit, toolchain string, preview bool) error {
+	names, e := validateSet(dir, version, commit, toolchain, preview, false)
 	if e != nil {
 		return e
 	}
-	var b strings.Builder
-	for _, f := range entries {
-		if f.IsDir() || (!strings.HasSuffix(f.Name(), ".tar.gz") && !strings.HasSuffix(f.Name(), ".zip")) {
-			continue
-		}
-		if !strings.HasPrefix(f.Name(), "makemkv-tui-v") {
-			return fmt.Errorf("unexpected archive %q", f.Name())
-		}
-		file, e := os.Open(filepath.Join(dir, f.Name()))
-		if e != nil {
-			return e
-		}
-		h := sha256.New()
-		_, readErr := io.Copy(h, file)
-		closeErr := file.Close()
-		if readErr != nil {
-			return readErr
-		}
-		if closeErr != nil {
-			return closeErr
-		}
-		fmt.Fprintf(&b, "%x  %s\n", h.Sum(nil), f.Name())
+	b, e := checksumData(dir, names)
+	if e != nil {
+		return e
 	}
-	if b.Len() == 0 {
-		return fmt.Errorf("no release archives in %s", dir)
+	if e = exclusiveWrite(filepath.Join(dir, checksumName), b); e != nil {
+		return e
 	}
-	return exclusiveWrite(filepath.Join(dir, "SHA256SUMS"), []byte(b.String()))
+	_, e = validateSet(dir, version, commit, toolchain, preview, true)
+	return e
 }

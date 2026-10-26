@@ -14,3 +14,11 @@ LICENSE text eol=lf
 *.zip binary
 *.gz binary
 *.exe binary
+*.deb binary
+*.py text eol=lf
+*.rb text eol=lf
+*.sh text eol=lf
+*.json text eol=lf
+**/Makefile text eol=lf
+**/PKGBUILD text eol=lf
+**/.SRCINFO text eol=lf

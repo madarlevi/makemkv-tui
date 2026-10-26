@@ -1,6 +1,7 @@
 # Contributing to makemkv-tui
 
-Use Go 1.25.0 or newer. Keep changes focused and describe user-visible behavior.
+Use the Go compiler pinned in `.go-version` for CI and release work; `go.mod`
+declares the minimum Go API level. Keep changes focused and describe user-visible behavior.
 Open an issue for broad architecture changes. No proprietary engine binaries,
 source, media, registration keys or private runtime plans belong in contributions.
 
@@ -17,6 +18,19 @@ CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 go build -o makemkv-tui-freebsd-amd64 ./
 On native Unix with a C compiler, also run `go test -race ./...`. Cross-builds
 verify compilation only. Document your OS, Go/engine version and checks in PRs.
 Tests must run without MakeMKV, real discs or a graphical desktop.
+
+Release tooling also requires Python 3.10+. Run its mocked tests before changing
+packaging or publication:
+
+```sh
+python3 -m unittest discover -s tools/release -p 'test_*.py' -v
+python3 -m unittest discover -s packaging/tools -p 'test_*.py' -v
+go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 -shellcheck= .github/workflows/*.yml
+```
+
+See [the release procedure](docs/RELEASE.md) for preview builds, exact toolchain
+selection, publication safeguards and the two-stage package workflow. Never use
+preview checksums in package submissions or replace an existing public asset.
 
 ## Architecture
 

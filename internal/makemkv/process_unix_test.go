@@ -4,10 +4,12 @@ package makemkv
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/madarlevi/makemkv-tui/internal/proccontrol"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -30,18 +32,22 @@ func TestCancellationEscalatesAndSecondStopForces(t *testing.T) {
 			if e != nil {
 				t.Fatal(e)
 			}
-			ctx, cancel := context.WithCancel(context.Background())
+			ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 			defer cancel()
 			ctx, kill := proccontrol.WithForce(ctx)
-			start := time.Now()
-			e = (Process{Binary: exe}).Run(ctx, []string{"-test.run=^TestIgnoringTermHelper$"}, func(string) {
+			var start time.Time
+			e = (Process{Binary: exe}).Run(ctx, []string{"-test.run=^TestIgnoringTermHelper$"}, func(line string) {
+				if strings.TrimSpace(line) != "ready" || !start.IsZero() {
+					return
+				}
+				start = time.Now()
 				cancel()
 				if force {
 					kill()
 				}
 			})
 			elapsed := time.Since(start)
-			if e != context.Canceled {
+			if !errors.Is(e, context.Canceled) || start.IsZero() {
 				t.Fatal(e)
 			}
 			if elapsed > 5*time.Second {

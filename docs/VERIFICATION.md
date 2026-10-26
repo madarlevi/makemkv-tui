@@ -1,4 +1,7 @@
-# Release preparation verification
+# Historical release preparation verification
+
+This report describes the earlier preparation. For v0.2.0 use
+[CI_RELEASE_VALIDATION.md](CI_RELEASE_VALIDATION.md).
 
 Local verification: 2026-10-24. Host: Windows amd64. Toolchain:
 `go version go1.26.5 windows/amd64`. Module declares Go 1.25.0; CI installs the

@@ -1,0 +1,7 @@
+makemkv-tui is an independent keyboard-driven terminal frontend for MakeMKV.
+It browses title and stream metadata, plans recursive ISO batches before
+extraction, and maintains JSON checkpoints for title-level recovery.
+
+The frontend is MIT licensed. The separately installed makemkvcon engine has
+its own licensing and usage requirements. No engine binaries or keys are
+included in this frontend package.

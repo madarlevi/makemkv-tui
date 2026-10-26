@@ -1,0 +1,50 @@
+name: Packaging validation
+on:
+  push:
+    branches: [main]
+    paths: ['packaging/**', 'tools/release/**', '.github/workflows/packaging.yml', '.go-version']
+  pull_request:
+    branches: [main]
+    paths: ['packaging/**', 'tools/release/**', '.github/workflows/packaging.yml', '.go-version']
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: false
+        default: ''
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  debian-format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CGO_ENABLED: '0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: .go-version
+      - name: Deterministic local preview package (no published release dependency)
+        run: |
+          export SOURCE_DATE_EPOCH="$(git show -s --format=%ct HEAD)"
+          commit="$(git rev-parse HEAD)"
+          python3 packaging/tools/package.py deb-local --commit "$commit" --out "$RUNNER_TEMP/deb-a"
+          python3 packaging/tools/package.py deb-local --commit "$commit" --out "$RUNNER_TEMP/deb-b"
+          cmp "$RUNNER_TEMP"/deb-a/*.deb "$RUNNER_TEMP"/deb-b/*.deb
+      - name: Native dpkg inspection and frontend smoke (no installation)
+        run: |
+          dpkg-deb --info "$RUNNER_TEMP"/deb-a/*.deb
+          dpkg-deb --contents "$RUNNER_TEMP"/deb-a/*.deb
+          dpkg-deb --extract "$RUNNER_TEMP"/deb-a/*.deb "$RUNNER_TEMP/deb-root"
+          dpkg-deb --control "$RUNNER_TEMP"/deb-a/*.deb "$RUNNER_TEMP/deb-control"
+          test "$("$RUNNER_TEMP/deb-root/usr/bin/makemkv-tui" --version)" = 'makemkv-tui v0.0.0'
+          test -f "$RUNNER_TEMP/deb-root/usr/share/doc/makemkv-tui/copyright"
+          (cd "$RUNNER_TEMP/deb-root" && md5sum -c ../deb-control/md5sums)

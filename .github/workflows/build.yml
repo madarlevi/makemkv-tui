@@ -1,60 +1,102 @@
 name: CI
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
   workflow_call:
+    inputs:
+      ref:
+        description: Exact source commit supplied by release resolver
+        type: string
+        required: false
+        default: ''
 permissions:
   contents: read
+defaults:
+  run:
+    shell: bash
 jobs:
-  test:
-    name: Native mocked tests (${{ matrix.os }})
+  native:
+    name: Native tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+        os: [ubuntu-24.04, windows-latest, macos-latest]
     env:
       CGO_ENABLED: '0'
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1, Node 24
         with:
+          ref: ${{ inputs.ref || github.sha }}
           persist-credentials: false
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0, Node 24
         with:
-          go-version-file: go.mod
+          go-version-file: .go-version
       - run: go vet -mod=readonly ./...
-      - run: go test -mod=readonly ./...
-      - name: Formatting
-        if: runner.os == 'Linux'
-        shell: bash
-        run: test -z "$(gofmt -l cmd internal tools)"
-      - name: Race tests (native Unix only)
+      - run: go mod verify
+      - name: Native mocked tests (retain JSON failure details)
+        run: go test -count=1 -timeout=5m -json -mod=readonly ./... | tee "$RUNNER_TEMP/native-tests.jsonl"
+      - name: Native race tests (Unix C compiler provided by hosted runner)
         if: runner.os != 'Windows'
-        run: go test -race -mod=readonly ./...
         env:
           CGO_ENABLED: '1'
+        run: go test -race -count=1 -timeout=5m -json -mod=readonly ./... | tee "$RUNNER_TEMP/race-tests.jsonl"
+      - name: Preserve test diagnostics even on failure
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2, Node 24
+        with:
+          name: tests-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/native-tests.jsonl
+            ${{ runner.temp }}/race-tests.jsonl
+          if-no-files-found: warn
+          overwrite: true
+          retention-days: 14
   cross:
-    name: Compile ${{ matrix.os }}/${{ matrix.arch }} (not runtime tests)
-    runs-on: ubuntu-latest
+    name: Compile ${{ matrix.target }} (not native testing)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { os: freebsd, arch: amd64 }
-          - { os: linux, arch: amd64 }
-          - { os: windows, arch: amd64 }
-          - { os: darwin, arch: amd64 }
-          - { os: darwin, arch: arm64 }
+        target: [freebsd/amd64, linux/amd64, windows/amd64, darwin/amd64, darwin/arm64]
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.ref || github.sha }}
           persist-credentials: false
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version-file: go.mod
-      - run: go build -mod=readonly -trimpath -o frontend ./cmd/makemkv-tui
+          go-version-file: .go-version
+      - name: CGO-disabled target compilation
         env:
-          GOOS: ${{ matrix.os }}
-          GOARCH: ${{ matrix.arch }}
+          TARGET: ${{ matrix.target }}
           CGO_ENABLED: '0'
+        run: |
+          export GOOS="${TARGET%/*}" GOARCH="${TARGET#*/}"
+          go build -mod=readonly -trimpath -buildvcs=false -o "$RUNNER_TEMP/frontend" ./cmd/makemkv-tui
+  tooling:
+    name: Release and packaging tooling
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: .go-version
+      - name: Formatting
+        run: |
+          unformatted="$(gofmt -l cmd internal tools)"
+          if [[ -n "$unformatted" ]]; then printf '%s\n' "$unformatted"; exit 1; fi
+      - run: python3 -m unittest discover -s tools/release -p 'test_*.py' -v
+      - run: python3 -m unittest discover -s packaging/tools -p 'test_*.py' -v
+      - run: bash -n packaging/aur/PKGBUILD.in
+      - name: Official workflow structure lint
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 -color -shellcheck= .github/workflows/*.yml

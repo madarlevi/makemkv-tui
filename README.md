@@ -56,66 +56,97 @@ publication on FreeBSD/Windows, in addition to previously completed outputs.
 
 ## Installation
 
-There is no makemkv-tui package-manager package. Download matching archives from
-[Releases](https://github.com/madarlevi/makemkv-tui/releases) **after the first
-release is published**, or build from source now. Archives contain the frontend,
-README and license notices, never the MakeMKV engine. Compare the archive's SHA256
-with its entry in `SHA256SUMS` before installing.
+The v0.2.0 workflow builds FreeBSD amd64, Linux amd64, Windows amd64, macOS amd64
+and macOS arm64. **Run the download commands only after Actions has published the
+v0.2.0 tag.** These expected asset names are a workflow contract, not a claim
+that an unreleased asset already exists. [Releases](https://github.com/madarlevi/makemkv-tui/releases).
+
+Each archive contains the frontend, README, MIT LICENSE, third-party notices and
+BUILDINFO.json. Keep the notices when redistributing. MakeMKV is never bundled.
 
 ### FreeBSD
 
 ```sh
-sha256 makemkv-tui-v0.1.0-freebsd-amd64.tar.gz
-tar -xzf makemkv-tui-v0.1.0-freebsd-amd64.tar.gz
+version=v0.2.0
+archive=makemkv-tui-${version}-freebsd-amd64.tar.gz
+base=https://github.com/madarlevi/makemkv-tui/releases/download/${version}
+fetch "${base}/${archive}"
+fetch "${base}/SHA256SUMS.txt"
+expected=$(awk -v name="$archive" '$2 == name {print $1}' SHA256SUMS.txt)
+[ -n "$expected" ] && [ "$expected" = "$(sha256 -q "$archive")" ] || exit 1
+mkdir makemkv-tui-release
+tar -xzf "$archive" -C makemkv-tui-release
+./makemkv-tui-release/makemkv-tui --version
 mkdir -p "$HOME/.local/bin"
-install -m 755 makemkv-tui "$HOME/.local/bin/makemkv-tui"
+install -m 755 makemkv-tui-release/makemkv-tui "$HOME/.local/bin/makemkv-tui"
 ```
 
-Add `$HOME/.local/bin` to PATH if needed. Install MakeMKV separately through your
-available port/package or existing installation. Follow that engine package's
-Linux compatibility/library instructions when required. The frontend itself is
-native FreeBSD. Check `makemkvcon --help` outside the TUI first.
-
-Build from source with Go installed:
-
-```sh
-git clone https://github.com/madarlevi/makemkv-tui.git
-cd makemkv-tui
-CGO_ENABLED=0 go build -mod=readonly -o makemkv-tui ./cmd/makemkv-tui
-./makemkv-tui --version
-```
+Add $HOME/.local/bin to PATH if needed. Install the external engine separately;
+the FreeBSD multimedia/makemkv port has its own license and Linux compatibility
+requirements. The frontend is a native FreeBSD executable. Check makemkvcon --help
+outside the TUI first. Preserve the included docs/license directory.
 
 ### Linux and macOS
 
-Download the matching archive when available. Use `sha256sum` on Linux or
-`shasum -a 256` on macOS, compare with `SHA256SUMS`, extract, and install the
-executable into PATH. The source build commands above also work here. Install the
-engine separately using [MakeMKV's instructions](https://www.makemkv.com/download/).
-
-Cross-build the FreeBSD frontend from another host:
-
-```sh
-CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 go build -mod=readonly -o makemkv-tui-freebsd-amd64 ./cmd/makemkv-tui
-```
+Download the matching archive plus SHA256SUMS.txt from the actual release.
+On Linux verify with `sha256sum --check --ignore-missing SHA256SUMS.txt`. On macOS,
+compare `shasum -a 256 ARCHIVE` with its exact filename entry. Extract into a new
+folder, run `./makemkv-tui --version`, then install it on PATH. macOS binaries
+are not Developer ID signed/notarized; local OS security policy may require review.
+Install MakeMKV separately using its [official instructions](https://www.makemkv.com/download/).
 
 ### Windows (PowerShell)
 
 ```powershell
-Get-FileHash .\makemkv-tui-v0.1.0-windows-amd64.zip -Algorithm SHA256
-Expand-Archive .\makemkv-tui-v0.1.0-windows-amd64.zip -DestinationPath .\makemkv-tui
-.\makemkv-tui\makemkv-tui.exe --version
+$Version = 'v0.2.0'
+$Archive = "makemkv-tui-$Version-windows-amd64.zip"
+$Base = "https://github.com/madarlevi/makemkv-tui/releases/download/$Version"
+Invoke-WebRequest "$Base/$Archive" -OutFile $Archive
+Invoke-WebRequest "$Base/SHA256SUMS.txt" -OutFile SHA256SUMS.txt
+$Pattern = '^[a-f0-9]{64}  ' + [regex]::Escape($Archive) + '$'
+$Lines = @(Get-Content SHA256SUMS.txt | Where-Object { $_ -match $Pattern })
+if ($Lines.Count -ne 1) { throw 'Missing or duplicate checksum entry' }
+$Expected = $Lines[0].Split(' ')[0]
+if ((Get-FileHash $Archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $Expected) { throw 'Checksum mismatch' }
+Expand-Archive $Archive -DestinationPath makemkv-tui-release
+.\makemkv-tui-release\makemkv-tui.exe --version
 ```
 
-Compare the hash with `SHA256SUMS`. Add the extracted folder and your separately
-installed `makemkvcon.exe` folder to PATH. Build with Git and Go installed:
+Add the frontend folder and the separately installed makemkvcon.exe folder to PATH.
+Use a fresh extraction folder; unsigned Windows binaries may receive OS warnings.
 
-```powershell
+### Source builds and go install
+
+Go 1.25 is the minimum application API level. Use the compiler pinned in
+[.go-version](.go-version), currently **1.26.10**, for release reproduction.
+
+```sh
 git clone https://github.com/madarlevi/makemkv-tui.git
 cd makemkv-tui
-$env:CGO_ENABLED = '0'
-go build -mod=readonly -o makemkv-tui.exe ./cmd/makemkv-tui
-.\makemkv-tui.exe
+git checkout v0.2.0  # after the tag exists
+CGO_ENABLED=0 go build -mod=readonly -trimpath -buildvcs=false -ldflags "-X main.version=v0.2.0" -o makemkv-tui ./cmd/makemkv-tui
+./makemkv-tui --version
 ```
+
+PowerShell: set `$env:CGO_ENABLED='0'` and use `go build` with the same flags and
+`-o makemkv-tui.exe`. For complete version/commit metadata use tools/release as
+shown in [the release guide](docs/RELEASE.md).
+
+```sh
+go install github.com/madarlevi/makemkv-tui/cmd/makemkv-tui@latest
+```
+
+Add GOBIN or $(go env GOPATH)/bin to PATH. Module installations report their module
+version; an untagged development build can say dev. Release executables must report
+their exact tag. `makemkv-tui version --json` also shows the embedded identity.
+
+### Package managers
+
+FreeBSD Ports, WinGet, Scoop, Debian/Ubuntu, AUR and Homebrew definitions use a
+[two-stage process](packaging/README.md): templates before release, then a read-only
+finalizer that fetches the actual published assets/source and verifies real hashes.
+No guessed v0.2.0 checksum or submission-ready download is committed in advance.
+No official package-manager acceptance or published personal tap/bucket is claimed.
 
 ## Quick start
 
@@ -291,7 +322,7 @@ CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 go build -o makemkv-tui-freebsd-amd64 ./
 ```
 
 Tests use synthetic fixtures and mocked engines. CI includes native Linux/macOS/
-Windows tests and separate cross-builds, not native FreeBSD tests. See
+Windows tests, native Unix race tests and separate cross-builds, not native FreeBSD tests. See
 [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and
 [release preparation](docs/RELEASE.md) for architecture, repository initialization,
 reproducible archives and draft releases.

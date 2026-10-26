@@ -1,0 +1,61 @@
+.TH MAKEMKV-TUI 1 "@DATE@" "makemkv-tui @VERSION@" "User Commands"
+.SH NAME
+makemkv-tui \- keyboard-driven MakeMKV frontend
+.SH SYNOPSIS
+.B makemkv-tui
+.RI [ options ] " [source]"
+.br
+.B makemkv-tui batch
+.I INPUT
+.B --output
+.I OUTPUT
+.br
+.B makemkv-tui batch --resume
+.I STATE
+.RB [ --retry-failed ]
+.SH DESCRIPTION
+Browse title and stream metadata and select titles for extraction with the
+separately installed makemkvcon engine. Source track rows are read-only.
+Batch mode plans all discovered ISOs before explicit extraction confirmation.
+Completed titles are verified and tracked in persistent JSON for recovery.
+.SH OPTIONS
+.TP
+.B --version
+Print the frontend version without starting the engine.
+.TP
+.B --help
+Show command help. Use batch --help for batch options.
+.TP
+.BI --config " PATH"
+Use the given frontend preferences file.
+.TP
+.BI --profile " PATH"
+Use an existing MakeMKV profile; effects depend on the installed engine.
+.TP
+.BI "batch --state " PATH
+Save a new plan at an explicit path.
+.TP
+.B batch --plans
+Choose a saved batch in the terminal UI.
+.TP
+.B batch --list
+List saved batches.
+.TP
+.B batch --state-dir
+Print the default batch-state directory.
+.SH KEYS
+Up/Down navigate visible rows. Left/Right or Tab fold the tree.
+Space toggles a title; A/D select/deselect all titles.
+Enter/PgDn advances batch planning, PgUp goes back, X skips, F shows summary.
+In the summary Enter opens confirmation; Y starts extraction.
+Ctrl+C stops immediately; another Ctrl+C forces termination.
+S finishes the current ISO then pauses. Ctrl+L opens logs; Ctrl+E expands errors.
+.SH FILES
+Default batch plans: $XDG_STATE_HOME/makemkv-tui/batches/ or
+$HOME/.local/state/makemkv-tui/batches/.
+Explicit legacy plan paths remain supported.
+.SH NOTES
+The frontend is MIT licensed. MakeMKV is not bundled and has separate license
+and usage requirements. Preserve JSON and staging data when publication fails.
+.SH SEE ALSO
+The installed README.md and BATCH.md, and makemkv-tui batch --help.

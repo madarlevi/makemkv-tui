@@ -1,0 +1,15 @@
+pkgbase = makemkv-tui
+	pkgdesc = Keyboard-driven MakeMKV frontend with resumable ISO batches
+	pkgver = 0.1.0
+	pkgrel = 1
+	url = https://github.com/madarlevi/makemkv-tui
+	arch = x86_64
+	arch = aarch64
+	license = MIT
+	makedepends = go>=1.25
+	optdepends = makemkv: external engine required for media processing; separately licensed
+	options = !lto
+	source = makemkv-tui-0.1.0.tar.gz::https://api.github.com/repos/madarlevi/makemkv-tui/tarball/v0.1.0
+	sha256sums = 4507f22fdb338f642f8e297129de5cbfe38883a62dc05dbbb71af01ca1920a7f
+
+pkgname = makemkv-tui

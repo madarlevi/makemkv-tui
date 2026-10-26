@@ -1,0 +1,52 @@
+{
+    "version": "0.1.0",
+    "description": "Keyboard-driven MakeMKV frontend with resumable ISO batches",
+    "homepage": "https://github.com/madarlevi/makemkv-tui",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": [
+                "https://github.com/madarlevi/makemkv-tui/releases/download/v0.1.0/makemkv-tui-v0.1.2-windows-amd64.zip",
+                "https://raw.githubusercontent.com/madarlevi/makemkv-tui/5a0c6950910ced230557ed88810c07629bed9e41/THIRD_PARTY.md",
+                "https://raw.githubusercontent.com/madarlevi/makemkv-tui/5a0c6950910ced230557ed88810c07629bed9e41/THIRD_PARTY_LICENSES.txt"
+            ],
+            "hash": [
+                "e74589d7a03d4749441b909e1628da8d53b23b0447dd25010b401afd85655230",
+                "5f11b70a6d84965664cb3df3bf0b549c1c189f312598446c633de6f1953ef458",
+                "30c833c93e87018a6d81a17b84970d48919f824c85e7f0aac09f684b52d58ab3"
+            ]
+        }
+    },
+    "bin": "makemkv-tui.exe",
+    "pre_install": [
+        "$exe = @(Get-ChildItem -LiteralPath $dir -File -Filter \"makemkv-tui*.exe\")",
+        "if ($exe.Count -ne 1) { throw \"Expected exactly one frontend executable\" }",
+        "if ($exe[0].Name -ne \"makemkv-tui.exe\") { Rename-Item -LiteralPath $exe[0].FullName -NewName \"makemkv-tui.exe\" -ErrorAction Stop }"
+    ],
+    "notes": [
+        "Requires separately installed makemkvcon on PATH with its separate license. No engine or keys bundled.",
+        "Upstream tag v0.1.0 is a prerelease; uploaded filenames say v0.1.2 and executable reports dev. Version follows the release tag.",
+        "Third-party notices are fetched separately from the same tagged source commit."
+    ],
+    "checkver": {
+        "url": "https://api.github.com/repos/madarlevi/makemkv-tui/releases?per_page=20",
+        "script": [
+            "$release = ($page | ConvertFrom-Json) | Where-Object { -not $_.draft } | Select-Object -First 1",
+            "$asset = @($release.assets | Where-Object { $_.name -match \"^makemkv-tui-.*-windows-amd64\\.zip$\" })",
+            "if ($asset.Count -ne 1) { throw \"Newest release must contain exactly one Windows amd64 ZIP\" }",
+            "\"$($release.tag_name)|$($asset[0].name)\""
+        ],
+        "regex": "v(?<version>[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?)\\|(?<asset>makemkv-tui-[^|]+-windows-amd64\\.zip)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": [
+                    "https://github.com/madarlevi/makemkv-tui/releases/download/v$version/$matchAsset",
+                    "https://raw.githubusercontent.com/madarlevi/makemkv-tui/v$version/THIRD_PARTY.md",
+                    "https://raw.githubusercontent.com/madarlevi/makemkv-tui/v$version/THIRD_PARTY_LICENSES.txt"
+                ]
+            }
+        }
+    }
+}

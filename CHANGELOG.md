@@ -1,5 +1,31 @@
 # Changelog
 
+
+## Unreleased — v0.2.0 CI and release repair
+
+- One tag-triggered publisher, native CI and separate cross-builds; Node 24 Actions
+  pins and a pinned Go 1.26.10 compiler. Manual release runs are previews only.
+- Strict five-target artifact collection, real checksums, embedded identity,
+  executable headers/modes, required notices and source-consistency validation.
+- Retry-safe draft uploads followed by automatic publication; existing public
+  assets are verified and never deleted/replaced. Retained test diagnostics.
+- Harden compiler-dependent color assertions and process-test readiness/timing;
+  historical job logs were inaccessible, so their exact failure is not asserted.
+- Preserve six package formats as templates plus a post-publication finalizer
+  using actual API assets/source/module hashes; no circular release dependency.
+- Version commands report linked release identity or Go module install version.
+  Extraction, JSON recovery and both stop modes are unchanged.
+
+## Unreleased — package-manager preparation
+
+- Add verified v0.1.0 release inventory, actual asset checksums, FreeBSD Ports,
+  WinGet/Scoop, Debian binary packaging, AUR metadata and Homebrew tap formula.
+- Build reproducible source-based .deb artifacts with full license notices;
+  verify schemas, Scoop update matching, AUR metadata and tagged-source builds.
+- Document upstream release filename/version and missing-notice issues. Gate
+  WinGet submission until corrected assets are published and audited.
+- Verify go install @latest. No application runtime or batch-format changes.
+
 ## Unreleased — initial public release preparation
 
 - Adopt github.com/madarlevi/makemkv-tui and verified 2026 madarlevi MIT attribution.

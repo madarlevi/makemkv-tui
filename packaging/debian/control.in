@@ -1,0 +1,13 @@
+Package: makemkv-tui
+Version: @VERSION@-1
+Section: contrib/video
+Priority: optional
+Architecture: amd64
+Maintainer: Madár Levente <madar.levi102@gmail.com>
+Installed-Size: @INSTALLED_SIZE@
+Homepage: https://github.com/madarlevi/makemkv-tui
+Description: keyboard-driven MakeMKV frontend with resumable ISO batches
+ Browse title and stream metadata and plan recursive ISO batches before extraction.
+ Persistent JSON state supports title-level recovery and two stop modes.
+ Requires the separately installed makemkvcon engine on PATH, subject to its own
+ license and usage requirements. No MakeMKV engine, keys or media are bundled.

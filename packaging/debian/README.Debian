@@ -1,0 +1,13 @@
+This is a third-party binary package, not an official Debian/Ubuntu archive entry.
+The frontend needs a separately installed makemkvcon engine on PATH to process
+media. No engine package name is assumed and no proprietary engine is bundled.
+The upstream frontend is MIT licensed; the engine has its own requirements.
+
+The package is classified contrib/video because media processing requires the
+separately licensed external engine. This binary repackaging recipe is not a
+Debian archive-quality source package. Official archive submission additionally
+needs Debian source packaging, dependencies, sponsorship and policy review.
+
+State lives in the user's XDG/HOME state directory; this package creates no
+system state, services, privileged users or configuration. Removing the package
+does not remove batch plans, preferences, staged data or completed outputs.

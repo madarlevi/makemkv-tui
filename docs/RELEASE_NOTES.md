@@ -1,14 +1,11 @@
-# makemkv-tui release candidate
+# makemkv-tui release
 
-Independent MIT-licensed terminal frontend; the MakeMKV engine is not bundled and
-has separate licensing and usage requirements. See README and CHANGELOG.
+This release contains five validated frontend archives and SHA256SUMS.txt.
+Each archive includes the frontend, README, MIT license, third-party notices and
+BUILDINFO.json identifying the tag, source commit, target and compiler.
 
-Archives contain only the frontend executable and documentation/license notices.
-Use SHA256SUMS to verify download integrity. These checksums are not signatures.
+MakeMKV is not bundled. Install makemkvcon separately and satisfy its own licensing
+and usage requirements. The frontend's MIT license does not alter engine terms.
 
-FreeBSD is cross-compiled, not runtime-tested by GitHub's hosted runners. Review
-native FreeBSD engine/FUSE/SSH results before publishing this draft. Source track
-selection and full Windows GUI parity are not claimed.
-
-Maintainer: replace this candidate note with version-specific highlights, actual
-CI/runtime results and known issues before clicking Publish release.
+FreeBSD is cross-compiled by CI. Real engine, optical drive, FUSE and SSH behavior
+must be evaluated separately on target hosts. See README and CHANGELOG for scope.

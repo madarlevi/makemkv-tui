@@ -26,8 +26,13 @@ func main() {
 }
 func run() error {
 	if len(os.Args) == 2 && (os.Args[1] == "--version" || os.Args[1] == "-version") {
-		fmt.Println("makemkv-tui " + version)
-		return nil
+		return printVersion(false)
+	}
+	if len(os.Args) == 2 && os.Args[1] == "version" {
+		return printVersion(false)
+	}
+	if len(os.Args) == 3 && os.Args[1] == "version" && os.Args[2] == "--json" {
+		return printVersion(true)
 	}
 	if len(os.Args) > 1 && os.Args[1] == "batch" {
 		return runBatch(os.Args[2:])

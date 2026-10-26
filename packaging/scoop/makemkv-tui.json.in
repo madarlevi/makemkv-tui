@@ -1,0 +1,27 @@
+{
+    "version": "@VERSION@",
+    "description": "Keyboard-driven MakeMKV frontend with resumable ISO batches",
+    "homepage": "https://github.com/madarlevi/makemkv-tui",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "@WINDOWS_URL@",
+            "hash": "@WINDOWS_SHA256@"
+        }
+    },
+    "bin": "makemkv-tui.exe",
+    "notes": "Requires separately installed makemkvcon on PATH with its separate license. No engine or keys bundled.",
+    "checkver": {
+        "github": "https://github.com/madarlevi/makemkv-tui"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/madarlevi/makemkv-tui/releases/download/v$version/makemkv-tui-v$version-windows-amd64.zip",
+                "hash": {
+                    "url": "https://github.com/madarlevi/makemkv-tui/releases/download/v$version/SHA256SUMS.txt"
+                }
+            }
+        }
+    }
+}
