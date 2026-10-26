@@ -1,4 +1,7 @@
-# Changed files
+# Initial release preparation changes
+
+The list below records the initial release preparation. The subsequent native
+CI test fixes are documented in [CI_TEST_FIX.md](CI_TEST_FIX.md).
 
 Compared with upstream commit `5a0c6950910ced230557ed88810c07629bed9e41`.
 This list includes itself. Historical package snapshots were moved under

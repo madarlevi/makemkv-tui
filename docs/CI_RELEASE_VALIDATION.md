@@ -1,5 +1,9 @@
 # CI and release preparation validation
 
+Follow-up: complete logs from the subsequent hosted run established four concrete
+native test failures. Their fixes and new verification results are documented in
+[CI_TEST_FIX.md](CI_TEST_FIX.md). The report below records the earlier preparation.
+
 Checked on **2026-10-26**, Windows amd64, pinned Go **1.26.10**. This is a local
 preparation report, not a claim that GitHub Actions or a public release has run.
 No commits, tags, pushes, Release publication or package submissions were made.

@@ -447,16 +447,77 @@ func TestDisconnectCancellation(t *testing.T) {
 	}
 }
 func TestChangedSourceAndOutputSymlinkRejected(t *testing.T) {
+	t.Run("changed source", func(t *testing.T) {
+		s, store := makePlan(t, []string{"disc.iso"}, 2)
+		if e := os.WriteFile(filepath.Join(s.InputRoot, "disc.iso"), []byte("different ISO data"), 0600); e != nil {
+			t.Fatal(e)
+		}
+		if e := Recover(context.Background(), s, store); e == nil {
+			t.Fatal("changed source accepted")
+		}
+	})
+	t.Run("output symlink", func(t *testing.T) {
+		s, store := makePlan(t, []string{"disc.iso"}, 2)
+		target := t.TempDir()
+		canary := filepath.Join(target, "untouched.txt")
+		if e := os.WriteFile(canary, []byte("retain this file"), 0600); e != nil {
+			t.Fatal(e)
+		}
+		link := filepath.Join(s.OutputRoot, "disc")
+		if e := os.Symlink(target, link); e != nil {
+			t.Skipf("directory symlinks unavailable: %v", e)
+		}
+		assertRecoveryFailureSaved(t, s, store, "symlink")
+		st, e := os.Lstat(link)
+		if e != nil || st.Mode()&os.ModeSymlink == 0 {
+			t.Fatal("recovery changed the link", e)
+		}
+		data, e := os.ReadFile(canary)
+		if e != nil || string(data) != "retain this file" {
+			t.Fatal("recovery changed the linked directory", e)
+		}
+		entries, e := os.ReadDir(target)
+		if e != nil || len(entries) != 1 {
+			t.Fatal("recovery wrote into the linked directory", entries, e)
+		}
+	})
+}
+
+// Per-title recovery failures are deliberately saved and displayed in the TUI;
+// a nil Recover error means that reconciliation was persisted, not that every
+// title succeeded. A failed title must still block the execution queue.
+func assertRecoveryFailureSaved(t *testing.T, s *batchstate.State, store *batchstate.Store, message string) {
+	t.Helper()
+	if e := Recover(context.Background(), s, store); e != nil {
+		t.Fatal("could not persist recovery failure", e)
+	}
+	q := load(t, store)
+	j := q.ISOs[0]
+	title := j.Titles[0]
+	if q.Status != batchstate.Failed || j.Status != batchstate.Failed || title.Status != batchstate.Failed || q.Progress.Failed != 1 {
+		t.Fatal("unsafe output was not persisted as failed", q.Status, j.Status, title.Status, q.Progress)
+	}
+	for _, failures := range [][]batchstate.Failure{q.Errors, j.Errors, title.Errors} {
+		if len(failures) == 0 || !strings.Contains(failures[0].Message, message) {
+			t.Fatal("missing recovery diagnostic", failures)
+		}
+	}
+	f := &fakeEngine{}
+	if e := NewControl(context.Background(), q, store, f).Run(); e == nil || len(f.calls) != 0 {
+		t.Fatal("failed recovery started extraction", e, f.calls)
+	}
+}
+
+func TestRecoveryFailureIsPersistedBeforeExtraction(t *testing.T) {
 	s, store := makePlan(t, []string{"disc.iso"}, 2)
-	os.WriteFile(filepath.Join(s.InputRoot, "disc.iso"), []byte("different ISO data"), 0600)
-	if e := Recover(context.Background(), s, store); e == nil {
-		t.Fatal("changed source accepted")
+	// This exercises the same recovery failure policy without symlink privileges.
+	// A directory at the final filename is an unverified collision, never an MKV.
+	out := filepath.Join(s.OutputRoot, "disc", "title2.mkv")
+	if e := os.MkdirAll(out, 0700); e != nil {
+		t.Fatal(e)
 	}
-	s2, store2 := makePlan(t, []string{"disc.iso"}, 2)
-	if e := os.Symlink(t.TempDir(), filepath.Join(s2.OutputRoot, "disc")); e != nil {
-		return
-	}
-	if e := Recover(context.Background(), s2, store2); e == nil {
-		t.Fatal("symlink accepted")
+	assertRecoveryFailureSaved(t, s, store, "unverified output collision")
+	if st, e := os.Stat(out); e != nil || !st.IsDir() {
+		t.Fatal("recovery changed the existing output", e)
 	}
 }

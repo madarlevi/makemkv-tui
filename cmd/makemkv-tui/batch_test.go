@@ -98,7 +98,17 @@ func TestBatchLocalStorageDuplicateAndLegacyResume(t *testing.T) {
 	if e != nil || s.ID != plans[0].State.ID && s.ID != plans[1].State.ID {
 		t.Fatal(s, e)
 	}
-	if store.Path != legacy || s.ISOs[0].RelativePath != "disc.iso" {
-		t.Fatal("legacy path or selection changed")
+	stored, e := os.Stat(store.Path)
+	if e != nil {
+		t.Fatal(e)
+	}
+	original, e := os.Stat(legacy)
+	if e != nil {
+		t.Fatal(e)
+	}
+	// Canonical parent spelling can differ on macOS and Windows. The original
+	// explicit legacy path must still name the same updated state file.
+	if !os.SameFile(stored, original) || s.ISOs[0].RelativePath != "disc.iso" {
+		t.Fatal("legacy file or selection changed", store.Path, legacy)
 	}
 }
